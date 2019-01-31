@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE tsung SYSTEM "@prefix@/share/@PACKAGE_NAME@/@DTD@">
+<tsung loglevel="debug">
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+
+  <servers>
+    <server host="example.com" port="80" type="tcp"></server>
+  </servers>
+
+  <load>
+    <arrivalphase phase="1" duration="60" unit="second">
+      <users arrivalrate="200" unit="second"></users>
+    </arrivalphase>
+  </load>
+
+  <options>
+    <option name="file_server" id="users" value="./data/users.example.csv"/>
+  </options>
+
+  <sessions>
+    <session name="example" probability="100" type="ts_http">
+      <setdynvars sourcetype="file" fileid="users" delimiter="," order="iter">
+        <var name="id" />
+        <var name="token" />
+      </setdynvars>
+
+      <request subst="true">
+        <http url="/require_authorization_header" method="GET">
+          <http_header name="Authorization" value="Bearer %%_token%%"/>
+        </http>
+      </request>
+    </session>
+  </sessions>
+</tsung>
